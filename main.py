@@ -8,6 +8,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 import random
 import numpy as np
+from starlette.responses import JSONResponse
 
 app = FastAPI()
 
@@ -43,8 +44,10 @@ def get_student_marks(inputs : MarksInput) -> SubjectMarks:
         index = inputs.names,
         columns = subjects,
     )
-
-    return SubjectMarks(marks=df[inputs.subjects].to_dict())
+    try:
+        return SubjectMarks(marks=df[inputs.subjects].to_dict())
+    except Exception as err:
+        return JSONResponse(content={'error': str(err)}, status_code=500)
 
 
 if __name__ == '__main__':
